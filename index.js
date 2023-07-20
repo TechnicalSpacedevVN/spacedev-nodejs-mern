@@ -1,7 +1,12 @@
 import express from "express";
 import { config } from "dotenv";
-import { taskRouter } from "./src/routes/task.route";
+import { taskRouter } from "./src/routes/task.router";
 import cors from "cors";
+import { categoryRouter } from "./src/routes/category.router";
+import { userRouter } from "./src/routes/user.router";
+import { logMiddleware } from "./src/middlewares/log.middleware";
+import { errorMiddleware } from "./src/middlewares/error.middleware";
+import { fileRouter } from "./src/routes/file.router";
 // const express = require("express");
 const app = express();
 // const {config} = require('dotenv')
@@ -12,26 +17,16 @@ const port = process.env.PORT;
 
 app.use(express.json());
 app.use(cors())
-
-app.get("/hello", (req, res, next) => {
-  console.log("Hello 1");
-  res.json({ hello: true });
-  // next();
-});
-
-app.get("/hello", (req, res, next) => {
-  console.log("Hello 2");
-  // next();
-
-  // res.json({ hello2: true });
-});
-
-app.get("/hello", (req, res) => {
-  console.log("Hello 3");
-  res.json({ hello3: true });
-});
+app.use(logMiddleware)
+app.use('/upload', express.static('./upload'))
 
 app.use("/task", taskRouter);
+app.use("/category", categoryRouter);
+app.use("/user", userRouter);
+app.use("/file", fileRouter);
+
+
+app.use(errorMiddleware)
 
 app.all("*", (req, res) => {
   res.status(404).json({ error: "Not Found" });
