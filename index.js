@@ -15,6 +15,8 @@ import { fileURLToPath } from "url";
 import { randomUUID } from "crypto";
 import { HttpResponse } from "./src/utils/HttpResponse";
 import handlebars from "express-handlebars";
+import helmet from 'helmet'
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,6 +39,8 @@ app.set("view engine", "html");
 app.set("views", path.resolve(__dirname, "./src/views"));
 
 app.disable("x-powered-by");
+
+app.use(helmet())
 app.use(express.json());
 app.use(cors());
 app.use(logMiddleware);
