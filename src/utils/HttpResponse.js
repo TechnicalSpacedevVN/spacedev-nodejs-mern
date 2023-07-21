@@ -63,4 +63,12 @@ export class HttpResponse {
       data,
     };
   }
+
+  static notFound(message) {
+    return {
+      status: "error",
+      code: 404,
+      message,
+    };
+  }
 }
