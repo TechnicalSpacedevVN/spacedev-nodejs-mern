@@ -3,24 +3,39 @@ import {
   PlusOutlined,
   PushpinOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, DatePicker, Form, Input, Modal } from "antd";
+import { Avatar, Button, ColorPicker, DatePicker, Form, Input, Modal } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { SelectTag } from "../SelectTag";
 import { DropdownSelect } from "../SelectUser";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/configs/api";
 import { queryClient } from "@/main";
-import { LIST_TASK } from "@/configs/queryKey";
+import { LIST_CATEGORY, LIST_TASK, LIST_USER } from "@/configs/queryKey";
+import { categoryService } from "@/services/category";
+import { userService } from "@/services/user";
+import { useForm } from "antd/es/form/Form";
 
-export const PopupNewTask = ({ open, onCancel }) => {
+export const PopupAddOrEditTask = ({ open, onCancel }) => {
+  const [form] = useForm()
+  
   const { mutate, isLoading } = useMutation({
     mutationFn: (value) => {
       return axiosInstance.post("/task", value);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries([LIST_TASK])
-      onCancel()
-    }
+      queryClient.invalidateQueries([LIST_TASK]);
+      onCancel();
+    },
+  });
+
+  const { data } = useQuery({
+    queryKey: [LIST_CATEGORY],
+    queryFn: categoryService.getCategories,
+  });
+
+  const { data: users } = useQuery({
+    queryKey: [LIST_USER],
+    queryFn: userService.getUsers,
   });
 
   return (
@@ -36,7 +51,7 @@ export const PopupNewTask = ({ open, onCancel }) => {
       }
       footer={null}
     >
-      <Form layout="vertical py-4" onFinish={mutate}>
+      <Form layout="vertical py-4" onFinish={mutate} form={form} defaultValue={{color: '#249FD4'}}>
         <Form.Item
           name="title"
           rules={[{ required: true }]}
@@ -45,19 +60,16 @@ export const PopupNewTask = ({ open, onCancel }) => {
         >
           <Input />
         </Form.Item>
+        <Form.Item label="Color" name="color">
+          <ColorPicker defaultValue="#ffffff" onChangeComplete={(color) => form.setFieldValue('color', color.toHexString())}/>
+        </Form.Item>
         <Form.Item
           // rules={[{ required: true }]}
           name="category"
           label="Category"
         >
           <SelectTag
-            options={[
-              { label: "All", value: "all" },
-              { label: "Education", value: "education", color: "green" },
-              { label: "Sports", value: "sports", color: "orange" },
-              { label: "Meetings", value: "meetings", color: "yellow" },
-              { label: "Friends", value: "friends", color: "blue" },
-            ]}
+            options={data?.map((e) => ({ label: e.name, value: e.id }))}
           />
         </Form.Item>
         <div className="flex w-full gap-2 mt-2">
@@ -79,43 +91,25 @@ export const PopupNewTask = ({ open, onCancel }) => {
           </Form.Item>
         </div>
         <Form.Item
-          name="user"
+          name="users"
           // rules={[{ required: true }]}
           label="Participants"
         >
           <DropdownSelect
-            options={[
-              {
-                value: 1,
-                avatar: "https://placehold.co/100x100",
-                name: "Emma",
-                label: (
-                  <Button size="small" className="flex items-center w-full">
-                    <Avatar
-                      className="mr-2"
-                      size={28}
-                      src="https://placehold.co/100x100"
-                    />{" "}
-                    Emma <PlusOutlined />
-                  </Button>
-                ),
-              },
-              {
-                value: 2,
-                avatar: "https://placehold.co/100x100",
-                name: "Liam",
-                label: (
-                  <Button size="small" className="flex items-center w-full">
-                    <Avatar
-                      className="mr-2"
-                      size={28}
-                      src="https://placehold.co/100x100"
-                    />{" "}
-                    Liam <PlusOutlined />
-                  </Button>
-                ),
-              },
-            ]}
+            options={users?.map((e) => ({
+              value: e.id,
+              ...e,
+              label: (
+                <Button size="small" className="flex items-center w-full">
+                  <Avatar
+                    className="mr-2"
+                    size={28}
+                    src="https://placehold.co/100x100"
+                  />{" "}
+                  {e.name} <PlusOutlined />
+                </Button>
+              ),
+            })) || []}
             renderSelected={({ option: user, remove }) => (
               <Button onClick={remove} className="flex items-center p-2">
                 <Avatar className="mr-2" size={28} src={user.avatar} />{" "}

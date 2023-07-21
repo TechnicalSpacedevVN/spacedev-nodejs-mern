@@ -22,5 +22,6 @@ export default {
     },
   },
   plugins: [],
+  safelist: ['bg-red-50', 'bg-green-50', 'bg-blue-50', 'bg-yellow-50'],
   corePlugins: {},
 };

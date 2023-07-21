@@ -11,6 +11,9 @@ export const taskRouter = Router();
 const updateTaskSchema = Joi.object({
   title: Joi.string(),
   description: Joi.string().optional().allow(null),
+  color: Joi.string(),
+  startDate: Joi.date().raw(),
+  endDate: Joi.date().raw(),
   category: Joi.custom((value, helper) => {
     if (!Category.findById(value)) {
       return helper.message("Không tìm thấy category");
@@ -48,8 +51,8 @@ taskRouter.get("/:id", async (req, res) => {
 // tạo task - C
 taskRouter.post("", validate(createTaskSchema), async (req, res, next) => {
   try {
-    const { title, description, category, users } = req.body;
-    const newTask = { title, description, category, users };
+    const { title, description, category, users, color } = req.body;
+    const newTask = { title, description, category, users, color };
 
     res.status(201).json(HttpResponse.created(Task.create(newTask)));
   } catch (err) {

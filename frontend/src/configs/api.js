@@ -7,7 +7,7 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.response.use((res) => {
     console.log('interceptors 1')
 
-    return res.data
+    return res.data?.data
 })
 
 axiosInstance.interceptors.response.use((res) => {
