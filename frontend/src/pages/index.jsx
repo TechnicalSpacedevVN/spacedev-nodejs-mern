@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PushpinOutlined from "@ant-design/icons/PushpinOutlined";
 import { ClockCircleOutlined } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, Skeleton, message } from "antd";
+import { Avatar, Button, Dropdown, Skeleton, Tooltip, message } from "antd";
 import { cn } from "@/utils";
 import { PopupNewTask } from "@/components/PopupNewTask";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -35,7 +35,7 @@ export const Home = () => {
             <Skeleton.Input style={{ height: 200, width: "100%" }} />
           ))}
         {data?.map((e) => (
-          <ToDoCard key={e.id} {...e} className="bg-red-50" />
+          <ToDoCard key={e.id} {...e} />
         ))}
         {/* <ToDoCard className="bg-red-50" />
         <ToDoCard className="bg-blue-50" />
@@ -47,7 +47,15 @@ export const Home = () => {
   );
 };
 
-const ToDoCard = ({ className, title, description, id }) => {
+const ToDoCard = ({
+  className,
+  title,
+  description,
+  id,
+  users,
+  category,
+  color,
+}) => {
   const { mutate } = useMutation({
     mutationFn: () => {
       return axiosInstance.delete(`/task/${id}`);
@@ -55,29 +63,32 @@ const ToDoCard = ({ className, title, description, id }) => {
     onMutate: () => {
       message.loading({
         key: id,
-        content: 'Đang xóa task'
-      })
+        content: "Đang xóa task",
+      });
     },
     onSuccess: () => {
       message.success({
         key: id,
-        content: 'Xóa task thành công'
-      })
-      queryClient.invalidateQueries([LIST_TASK])
+        content: "Xóa task thành công",
+      });
+      queryClient.invalidateQueries([LIST_TASK]);
     },
     onError: () => {
       message.error({
         key: id,
-        content: 'Xóa task thất bại'
-      })
+        content: "Xóa task thất bại",
+      });
     },
   });
 
   return (
-    <div className={cn("p-4 rounded-lg relative", className)}>
+    <div
+      className={cn("p-4 rounded-lg relative", className)}
+      style={{ background: `${color}20` }}
+    >
       <h3 className="text-lg font-[600] flex items-center justify-between">
         <span>{title}</span>
-        <Avatar size={40} src="https://placehold.co/100x100" />
+        <p>{category?.name}</p>
       </h3>
       <p className="text-sm text-gray-500 mt-1">{description}</p>
       <div className="text-blue-400 cursor-pointer mt-2 pb-3 border-0 border-solid border-b border-gray-300">
@@ -89,8 +100,17 @@ const ToDoCard = ({ className, title, description, id }) => {
         </div>
         <div>
           <Avatar.Group>
-            <Avatar size={35} src="https://placehold.co/100x100" />
-            <Avatar size={35} src="https://placehold.co/100x100" />
+            {users?.map((e) => {
+              console.log(e)
+              return (
+                <Tooltip key={e.id} title={e.name}>
+                  <Avatar
+                    size={35}
+                    src={e?.avatar || "https://placehold.co/100x100"}
+                  />
+                </Tooltip>
+              );
+            })}
           </Avatar.Group>
         </div>
       </div>

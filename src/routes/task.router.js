@@ -4,6 +4,8 @@ import { validate } from "../middlewares/validate.middleware";
 import Joi from "joi";
 import { Category } from "../models/category.model";
 import { User } from "../models/user.model";
+import { BadRequest, Created, NoContent } from "../config/StatusCode";
+import { HttpResponse } from "../utils/HttpResponse";
 
 export const taskRouter = Router();
 
@@ -22,6 +24,7 @@ const updateTaskSchema = Joi.object({
         return helper.message("Không tìm thấy user");
       }
     }),
+  color: Joi.string().optional().default("#ffffff"),
 });
 
 const createTaskSchema = updateTaskSchema.fork(
@@ -32,7 +35,7 @@ const createTaskSchema = updateTaskSchema.fork(
 // Lấy danh sách tásk - R
 taskRouter.get("", async (req, res) => {
   // await delay(2000);
-  res.json(Task.find(req.query));
+  res.json(HttpResponse.Paginate(Task.find(req.query)));
 });
 
 taskRouter.get("/:id", async (req, res) => {
@@ -42,15 +45,15 @@ taskRouter.get("/:id", async (req, res) => {
     return res.json(Task.findById(req.params.id));
   }
 
-  res.status(400).json({ error: "Task Not found" });
+  res.status(BadRequest).json({ error: "Task Not found" });
 });
 // tạo task - C
 taskRouter.post("", validate(createTaskSchema), async (req, res, next) => {
   try {
-    const { title, description, category, users } = req.body;
-    const newTask = { title, description, category, users };
+    const { title, description, category, users, color } = req.body;
+    const newTask = { title, description, category, users, color };
 
-    res.json({ task: Task.create(newTask) });
+    res.status(Created).json(HttpResponse.created(Task.create(newTask)));
   } catch (err) {
     next(err);
   }
@@ -81,7 +84,7 @@ taskRouter.patch("/:id", validate(updateTaskSchema), async (req, res) => {
       }),
     });
   } else {
-    res.status(400).json({ error: "Task not found" });
+    res.status(BadRequest).json({ error: "Task not found" });
   }
 });
 // Xóa task - D
@@ -89,8 +92,8 @@ taskRouter.delete("/:id", async (req, res) => {
   const { id } = req.params;
   let check = Task.deleteById(id);
   if (check) {
-    res.json({ deleted: true });
+    res.status(NoContent).json({ deleted: true });
   } else {
-    res.status(400).json({ error: "Task not found" });
+    res.status(BadRequest).json({ error: "Task not found" });
   }
 });

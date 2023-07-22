@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import moment from "moment";
 import fs from 'fs'
+import { HttpResponse } from "../utils/HttpResponse";
 
 export const errorMiddleware = (err, req, res, next) => {
   let log = 
@@ -12,5 +13,6 @@ export const errorMiddleware = (err, req, res, next) => {
 
   fs.appendFile(`./errors/${moment().format("DD-MM-YYYY")}.txt`, log, () => {});
 
-  res.status(400).json({ error: err });
+  res.status(400).json(HttpResponse.error(err));
 };
+
