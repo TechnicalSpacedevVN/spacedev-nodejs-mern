@@ -1,3 +1,4 @@
+import collection from "../config/database";
 import { readJsonFile, writeJsonFile } from "../utils/file";
 import { Category } from "./category.model";
 import { User } from "./user.model";
@@ -26,23 +27,25 @@ const findById = (id) => {
 
   return false;
 };
-const create = (data) => {
-  data.id = new Date().getTime();
-  if(data.category) {
-    let check = Category.findById(data.category)
-    if(!check) {
-      throw "Category not found"
-    }
-  }
-  if(Array.isArray(data.users)) {
-    let check = User.findByIds(data.users).length === data.users.length
-    if(!check) {
-      throw "User not found"
-    }
-  }
-  tasks.push(data);
-  writeJsonFile("tasks", tasks);
-  return data;
+const create = async (data) => {
+  let task = await collection.Task.insertOne(data)
+
+  // data.id = new Date().getTime();
+  // if(data.category) {
+  //   let check = Category.findById(data.category)
+  //   if(!check) {
+  //     throw "Category not found"
+  //   }
+  // }
+  // if(Array.isArray(data.users)) {
+  //   let check = User.findByIds(data.users).length === data.users.length
+  //   if(!check) {
+  //     throw "User not found"
+  //   }
+  // }
+  // tasks.push(data);
+  // writeJsonFile("tasks", tasks);
+  return task;
 };
 const updateById = (id, dataUpdate) => {
   let c = tasks.find((e) => e.id === parseInt(id));

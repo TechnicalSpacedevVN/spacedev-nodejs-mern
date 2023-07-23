@@ -17,10 +17,10 @@ export class HttpResponse {
     };
   }
 
-  static error(errors) {
+  static error(errors, code = 400) {
     return {
       status: "error",
-      code: 400,
+      code,
       message: "Dữ liệu không hợp lệ.",
       error_code: "ERR123456",
       errors,

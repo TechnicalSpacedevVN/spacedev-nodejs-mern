@@ -16,6 +16,7 @@ import helmet from "helmet";
 import { pageRouter } from "./src/routes/page.router";
 import handlebars from 'express-handlebars'
 import { xTokenMiddleware } from "./src/middlewares/x-token.middleware";
+import './src/config/database'
 
 
 
@@ -57,6 +58,7 @@ app.use(assignId);
 
 // app.use(logMiddleware)
 app.use(morgan("combined", { stream: accessLogStream }));
+app.use(morgan("combined"));
 app.use("/upload", express.static("./upload"));
 app.use(express.static('./public'))
 

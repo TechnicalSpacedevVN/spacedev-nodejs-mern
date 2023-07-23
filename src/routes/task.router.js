@@ -53,7 +53,7 @@ taskRouter.post("", validate(createTaskSchema), async (req, res, next) => {
     const { title, description, category, users, color } = req.body;
     const newTask = { title, description, category, users, color };
 
-    res.status(Created).json(HttpResponse.created(Task.create(newTask)));
+    res.status(Created).json(HttpResponse.created(await Task.create(newTask)));
   } catch (err) {
     next(err);
   }
