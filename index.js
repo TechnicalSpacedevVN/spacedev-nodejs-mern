@@ -14,11 +14,9 @@ import { fileURLToPath } from "url";
 import path, { dirname } from "path";
 import helmet from "helmet";
 import { pageRouter } from "./src/routes/page.router";
-import handlebars from 'express-handlebars'
+import handlebars from "express-handlebars";
 import { xTokenMiddleware } from "./src/middlewares/x-token.middleware";
-import './src/config/database'
-
-
+import "./src/config/database";
 
 let __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -43,24 +41,23 @@ function assignId(req, res, next) {
 }
 
 const hdb = handlebars.create({
-  extname: '.html',
-})
-app.engine('html', hdb.engine)
-app.set('view engine', 'html')
-app.set('views', path.resolve(__dirname, './src/views'))
-
+  extname: ".html",
+});
+app.engine("html", hdb.engine);
+app.set("view engine", "html");
+app.set("views", path.resolve(__dirname, "./src/views"));
 
 app.use(express.json());
 app.use(cors());
 
-app.use(helmet())
+app.use(helmet());
 app.use(assignId);
 
 // app.use(logMiddleware)
 app.use(morgan("combined", { stream: accessLogStream }));
 app.use(morgan("combined"));
 app.use("/upload", express.static("./upload"));
-app.use(express.static('./public'))
+app.use(express.static("./public"));
 
 // app.use(xTokenMiddleware)
 
@@ -69,7 +66,7 @@ app.use("/category", categoryRouter);
 app.use("/user", userRouter);
 app.use("/file", fileRouter);
 
-app.use(pageRouter)
+app.use(pageRouter);
 
 app.use(errorMiddleware);
 

@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { User } from "../models/user.model";
+import { User } from "../repository/user.repository";
 import { HttpResponse } from "../utils/HttpResponse";
 import Joi from "joi";
 import { validate } from "../middlewares/validate.middleware";
-import {validatePassowrd} from '../utils/validate'
+import { validatePassowrd } from "../utils/validate";
 
 export const userRouter = Router();
 

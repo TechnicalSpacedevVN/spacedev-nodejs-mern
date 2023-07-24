@@ -1,9 +1,11 @@
 import { MongoClient } from "mongodb";
+import { config } from "dotenv";
+config();
+const url = process.env.MONGODB_CONNECT;
 
-const url = "mongodb://localhost:27017";
 const client = new MongoClient(url);
 
-const dbName = "spacedev-mern";
+const dbName = process.env.DATABASE_NAME;
 
 const main = async () => {
   await client.connect();

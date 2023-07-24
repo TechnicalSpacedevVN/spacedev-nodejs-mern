@@ -1,26 +1,29 @@
 import collection from "../config/database";
 import { readJsonFile, writeJsonFile } from "../utils/file";
-import { Category } from "./category.model";
-import { User } from "./user.model";
+import { CategoryRepository } from "./category.repository";
+import { User } from "./user.repository";
 import _ from "lodash";
 
 const tasks = readJsonFile("tasks") || [];
 
 const find = (query) => {
-  return _.filter(tasks, query).map((e) => {
-    return {
-      ...e,
-      category: e.category ? Category.findById(e.category) : null,
-      users: Array.isArray(e.users) ? User.findByIds(e.users) : null,
-    };
-  });
+  return collection.Task.find(query).toArray();
+  // return _.filter(tasks, query).map(async (e) => {
+  //   return {
+  //     ...e,
+  //     category: e.category ? await Category.findById(e.category) : null,
+  //     users: Array.isArray(e.users) ? User.findByIds(e.users) : null,
+  //   };
+  // });
 };
 const findById = (id) => {
   let t = tasks.find((e) => e.id === parseInt(id));
   if (t) {
     return {
       ...t,
-      category: t.category ? Category.findById(t.category) : undefined,
+      category: t.category
+        ? CategoryRepository.findById(t.category)
+        : undefined,
       users: Array.isArray(t.users) ? User.findByIds(t.users) : null,
     };
   }
@@ -28,7 +31,7 @@ const findById = (id) => {
   return false;
 };
 const create = async (data) => {
-  let task = await collection.Task.insertOne(data)
+  let task = await collection.Task.insertOne(data);
 
   // data.id = new Date().getTime();
   // if(data.category) {
