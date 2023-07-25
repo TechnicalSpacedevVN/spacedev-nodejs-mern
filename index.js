@@ -16,6 +16,7 @@ import helmet from "helmet";
 import { pageRouter } from "./src/routes/page.router";
 import handlebars from 'express-handlebars'
 import { xTokenMiddleware } from "./src/middlewares/x-token.middleware";
+import './src/config/database'
 
 
 

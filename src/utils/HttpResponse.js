@@ -64,4 +64,13 @@ export class HttpResponse {
       data,
     };
   }
+
+  static notFound(mesage = "Không tìm thấy dữ liệu") {
+    return {
+      status: "not-found",
+      code: 404,
+      mesage,
+      error_code: "NOT_FOUND",
+    };
+  }
 }

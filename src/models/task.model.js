@@ -1,71 +1,131 @@
-import { readJsonFile, writeJsonFile } from "../utils/file";
 import { Category } from "./category.model";
 import { User } from "./user.model";
 import _ from "lodash";
+import { DEFAULT_LIMIT, Task as TaskRepository } from "../config/database";
+import { ObjectId } from "mongodb";
 
-const tasks = readJsonFile("tasks") || [];
+const count = async (query) => {
+  let _query = _.omit(query, "title", "isDone");
 
-const find = (query) => {
-  return _.filter(tasks, query).map((e) => {
-    return {
-      ...e,
-      category: e.category ? Category.findById(e.category) : null,
-      users: Array.isArray(e.users) ? User.findByIds(e.users) : null,
-    };
-  });
+  if (query.title) {
+    _query.$text = { $search: query.title };
+  }
+
+  if (query.isDone) {
+    _query.isDone = query.isDone === "true";
+  }
+  
+  let count = await TaskRepository.countDocuments(_query);
+
+  return count
+}
+
+const paginate = async (query, page, perPage, sortBy, sortValue) => {
+  let _query = _.omit(query, "title", "isDone");
+
+  if (query.title) {
+    _query.$text = { $search: query.title };
+  }
+
+  if (query.isDone) {
+    _query.isDone = query.isDone === "true";
+  }
+
+  let skip = (page - 1) * perPage;
+
+  let count = await TaskRepository.countDocuments(_query);
+
+  let totalPage = Math.ceil(count / perPage);
+
+  let result = await TaskRepository.find(_query)
+    .limit(perPage)
+    .skip(skip)
+    .sort(sortBy, sortValue)
+    .toArray();
+
+  let response = {
+    data: result,
+    totalPage,
+    currentPage: page,
+    total: count
+  }
+
+  if(page < totalPage) {
+    response.nextPage = page + 1
+  }
+
+  if(page > 1) {
+    response.prevPage = page - 1
+  }
+
+  return response
 };
-const findById = (id) => {
-  let t = tasks.find((e) => e.id === parseInt(id));
-  if (t) {
-    return {
-      ...t,
-      category: t.category ? Category.findById(t.category) : undefined,
-      users: Array.isArray(t.users) ? User.findByIds(t.users) : null,
-    };
+
+const find = async (query) => {
+  let _query = _.omit(query, "title", "isDone");
+
+  if (query.title) {
+    _query.$text = { $search: query.title };
   }
 
-  return false;
+  if (query.isDone) {
+    _query.isDone = query.isDone === "true";
+  }
+  let result = await TaskRepository.find(_query).toArray();
+  return result;
 };
-const create = (data) => {
-  data.id = new Date().getTime();
-  if(data.category) {
-    let check = Category.findById(data.category)
-    if(!check) {
-      throw "Category not found"
-    }
+const findById = async (id) => {
+  if (ObjectId.isValid(id)) {
+    return await TaskRepository.findOne({ _id: new ObjectId(id) });
   }
-  if(Array.isArray(data.users)) {
-    let check = User.findByIds(data.users).length === data.users.length
-    if(!check) {
-      throw "User not found"
-    }
-  }
-  tasks.push(data);
-  writeJsonFile("tasks", tasks);
+
+  return null;
+};
+const create = async (data) => {
+  let result = await TaskRepository.insertOne(data);
+  data._id = result.insertedId;
+
   return data;
+
+  // data.id = new Date().getTime();
+  // if(data.category) {
+  //   let check = Category.findById(data.category)
+  //   if(!check) {
+  //     throw "Category not found"
+  //   }
+  // }
+  // if(Array.isArray(data.users)) {
+  //   let check = User.findByIds(data.users).length === data.users.length
+  //   if(!check) {
+  //     throw "User not found"
+  //   }
+  // }
+  // tasks.push(data);
+  // writeJsonFile("tasks", tasks);
+  // return data;
 };
-const updateById = (id, dataUpdate) => {
-  let c = tasks.find((e) => e.id === parseInt(id));
-  if (c) {
-    Object.assign(c, dataUpdate);
-    writeJsonFile("tasks", tasks);
-    return true;
+const updateById = async (id, dataUpdate) => {
+  if (ObjectId.isValid(id)) {
+    let result = await TaskRepository.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: dataUpdate }
+    );
+    return result.modifiedCount >= 1;
   }
 
   return false;
 };
-const deleteById = (id) => {
-  let i = tasks.findIndex((e) => e.id === parseInt(id));
-  if (i !== -1) {
-    tasks.splice(i, 1);
-    writeJsonFile("tasks", tasks);
-    return true;
+const deleteById = async (id) => {
+  if (ObjectId.isValid(id)) {
+    let result = await TaskRepository.deleteOne({ _id: new ObjectId(id) });
+    return result.deletedCount >= 1;
   }
-
   return false;
 };
 
 export const Task = {
+  count,
+  paginate,
   find,
   findById,
   create,

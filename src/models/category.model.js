@@ -1,36 +1,42 @@
 import _ from "lodash";
-import { readJsonFile, writeJsonFile } from "../utils/file";
+import { Category as CategoryRepository } from "../config/database";
+import { ObjectId } from "mongodb";
 
-const categories = readJsonFile("categories") || [];
+const find = async (query) => {
+  return await CategoryRepository.find().toArray();
+};
+const findById = async (id) => {
+  if (ObjectId.isValid(id)) {
+    return await CategoryRepository.findOne({ _id: new ObjectId(id) });
+  }
 
-const find = (query) => {
-  return _.filter(categories, query);
+  return null;
 };
-const findById = (id) => {
-  return categories.find((e) => e.id === parseInt(id));
+const create = async (data) => {
+  const result = await CategoryRepository.insertOne(data);
+  if (result.insertedId) {
+    data._id = result.insertedId;
+    return data;
+  }
+  return false;
 };
-const create = (data) => {
-  data.id = new Date().getTime();
-  categories.push(data);
-  writeJsonFile("categories", categories);
-  return data;
-};
-const updateById = (id, dataUpdate) => {
-  let c = categories.find((e) => e.id === parseInt(id));
-  if (c) {
-    Object.assign(c, dataUpdate);
-    writeJsonFile("categories", categories);
-    return true;
+const updateById = async (id, dataUpdate) => {
+  if (ObjectId.isValid(id)) {
+    let result = await CategoryRepository.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: dataUpdate,
+      }
+    );
+    return result.modifiedCount >= 1;
   }
 
   return false;
 };
-const deleteById = (id) => {
-  let i = categories.findIndex((e) => e.id === parseInt(id));
-  if (i !== -1) {
-    categories.splice(i, 1);
-    writeJsonFile("categories", categories);
-    return true;
+const deleteById = async (id) => {
+  if (ObjectId.isValid(id)) {
+    let result = await UserRepository.deleteOne({ _id: new ObjectId(id) });
+    return result.modifiedCount >= 1;
   }
 
   return false;
