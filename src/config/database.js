@@ -16,8 +16,15 @@ const main = async () => {
   const Category = db.collection("categories");
   const User = db.collection("users");
 
+  User.createIndex({ name: "text" }, function (err, result) {
+    console.log(result);
+    callback(result);
+  });
+
   return { Task, Category, User };
 };
 let collection = await main();
 
 export default collection;
+
+export const DEFAULT_LIMIT = 10;

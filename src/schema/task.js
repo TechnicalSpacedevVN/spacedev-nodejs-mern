@@ -1,12 +1,12 @@
 import Joi from "joi";
-import { CategoryRepository } from "../repository/category.repository";
-import { User } from "../repository/user.repository";
+import { Category } from "../models/category.model";
+import { User } from "../models/user.model";
 
 export const updateTaskSchema = Joi.object({
   title: Joi.string(),
   description: Joi.string().optional().allow(null),
   category: Joi.custom(async (value, helper) => {
-    if (!(await CategoryRepository.findById(value))) {
+    if (!(await Category.findById(value))) {
       return helper.message("Không tìm thấy category");
     }
   }),

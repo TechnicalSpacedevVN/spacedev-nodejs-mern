@@ -1,11 +1,26 @@
 import { BadRequest, Created, NoContent } from "../config/StatusCode";
 import { HttpResponse } from "../utils/HttpResponse";
-import { Task } from "../repository/task.repository";
+import { Task } from "../models/task.model";
+import _ from "lodash";
 
 export const TaskController = {
   get: async (req, res, next) => {
     try {
-      res.json(HttpResponse.Paginate(await Task.find(req.query)));
+      let query = _.omit(req.query, "page", "sort");
+      let [sortBy = "_id", sortValue = "asc"] = req.query?.sort?.split(",") || [
+        "_id",
+        "asc",
+      ];
+      res.json(
+        HttpResponse.Paginate(
+          await Task.paginate(
+            query,
+            parseInt(req.query.page || 1),
+            sortBy,
+            sortValue
+          )
+        )
+      );
     } catch (err) {
       next(err);
     }

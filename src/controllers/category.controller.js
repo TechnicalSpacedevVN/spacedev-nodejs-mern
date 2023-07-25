@@ -1,18 +1,19 @@
+import _ from "lodash";
 import { NoContent, NotFound } from "../config/StatusCode";
-import { CategoryRepository } from "../repository/category.repository";
+import { Category } from "../models/category.model";
 import { HttpResponse } from "../utils/HttpResponse";
 
 export const CategoryController = {
   get: async (req, res, next) => {
     try {
-      res.json(HttpResponse.Paginate(await CategoryRepository.find(req.query)));
+      res.json(HttpResponse.Paginate(await Category.find(req.query)));
     } catch (err) {
       next(err);
     }
   },
   getDetail: async (req, res, next) => {
     try {
-      let detail = await CategoryRepository.findById(req.params.id);
+      let detail = await Category.findById(req.params.id);
       if (detail) {
         res.json(HttpResponse.detail(detail));
       } else {
@@ -26,7 +27,7 @@ export const CategoryController = {
   },
   deleteById: async (req, res, next) => {
     try {
-      let check = await CategoryRepository.deleteById(req.params.id);
+      let check = await Category.deleteById(req.params.id);
       if (check) {
         res.status(NoContent).json({ deleted: true });
       } else {
@@ -42,7 +43,7 @@ export const CategoryController = {
     try {
       const { name } = req.body;
       const { id } = req.params;
-      let check = await CategoryRepository.updateById(id, { name });
+      let check = await Category.updateById(id, { name });
       if (check) {
         res.json(HttpResponse.updated(check));
       } else {
@@ -55,7 +56,7 @@ export const CategoryController = {
   create: async (req, res, err) => {
     try {
       const { name } = req.body;
-      res.json(HttpResponse.created(await CategoryRepository.create({ name })));
+      res.json(HttpResponse.created(await Category.create({ name })));
     } catch (err) {
       next(err);
     }

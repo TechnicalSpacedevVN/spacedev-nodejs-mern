@@ -20,5 +20,5 @@ export const validatePassowrd = (value, helper) => {
     return helper.message("Không được chứa tên trong pasword");
   }
 
-  if (count < 3) return helper.message("Password của bản không đủ mạnh");
+  if (count < 3) return helper.message("Password của bạn không đủ mạnh");
 };

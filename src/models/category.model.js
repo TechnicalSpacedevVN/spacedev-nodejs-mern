@@ -1,24 +1,32 @@
 import _ from "lodash";
-import { Category } from "../model/Category.model";
 import { ObjectId } from "mongodb";
+import collection from "../config/database";
 
-const find = async (query) => {
-  return Category.find(query).toArray();
+export const CategoryRepository = collection.Category;
+
+const find = async (query = {}) => {
+  let { name } = query;
+
+  let _query = _.omit(query, "name");
+  if (name) {
+    _query.name = { $regex: new RegExp(name, "i") };
+  }
+  return CategoryRepository.find(_query).toArray();
 };
 const findById = async (id) => {
   if (ObjectId.isValid(id)) {
-    return await Category.findOne({ _id: new ObjectId(id) });
+    return await CategoryRepository.findOne({ _id: new ObjectId(id) });
   }
   return null;
 };
 const create = async (data) => {
-  let result = await Category.insertOne(data);
+  let result = await CategoryRepository.insertOne(data);
   data._id = result.insertedId;
   return data;
 };
 const updateById = async (id, dataUpdate) => {
   if (ObjectId.isValid(id)) {
-    let result = await Category.updateOne(
+    let result = await CategoryRepository.updateOne(
       { _id: new ObjectId(id) },
       { $set: dataUpdate }
     );
@@ -32,13 +40,13 @@ const updateById = async (id, dataUpdate) => {
 };
 const deleteById = async (id) => {
   if (ObjectId.isValid(id)) {
-    let result = await Category.deleteOne({ _id: new ObjectId(id) });
+    let result = await CategoryRepository.deleteOne({ _id: new ObjectId(id) });
     return result.deletedCount > 0;
   }
   return false;
 };
 
-export const CategoryRepository = {
+export const Category = {
   find,
   findById,
   create,
