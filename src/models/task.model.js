@@ -14,21 +14,16 @@ const tasks = readJsonFile("tasks") || [];
  *
  */
 
-const paginate = async ({
-  query = {},
-  page = 1,
-  perPage = DEFAULT_LIMIT,
-  fields = [],
-}) => {
-  let { title } = query;
+const paginate = async (...args) => {
+  // let { title } = query;
 
-  let _query = _.omit(query, "title");
-  if (title) {
-    _query.title = { $regex: new RegExp(title, "i") };
-  }
-  let count = await TaskRepository.countDocuments(_query);
+  // let _query = _.omit(query, "title");
+  // if (title) {
+  //   _query.title = { $regex: new RegExp(title, "i") };
+  // }
+  // let count = await TaskRepository.countDocuments(_query);
 
-  let skip = (page - 1) * DEFAULT_LIMIT;
+  // let skip = (page - 1) * DEFAULT_LIMIT;
   // let data = await TaskRepository.find(_query)
   //   .limit(perPage)
   //   .skip(skip)
@@ -46,55 +41,56 @@ const paginate = async ({
   //   })
   // );
 
-  const pipeline = [
-    {
-      $match: _query,
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "category",
-        foreignField: "_id",
-        as: "category",
-      },
-    },
-    {
-      $unwind: "$category", // convert từ array thành single
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "users",
-        foreignField: "_id",
-        as: "users",
-      },
-    },
-  ];
-  if (fields.length > 0) {
-    pipeline.push({
-      $project: fields.reduce(
-        (result, currentValue) => ({ ...result, [currentValue]: 1 }),
-        {}
-      ),
-    });
-  }
+  // const pipeline = [
+  //   {
+  //     $match: _query,
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: "categories",
+  //       localField: "category",
+  //       foreignField: "_id",
+  //       as: "category",
+  //     },
+  //   },
+  //   {
+  //     $unwind: "$category", // convert từ array thành single
+  //   },
+  //   {
+  //     $lookup: {
+  //       from: "users",
+  //       localField: "users",
+  //       foreignField: "_id",
+  //       as: "users",
+  //     },
+  //   },
+  // ];
+  // if (fields.length > 0) {
+  //   pipeline.push({
+  //     $project: fields.reduce(
+  //       (result, currentValue) => ({ ...result, [currentValue]: 1 }),
+  //       {}
+  //     ),
+  //   });
+  // }
 
-  let data = await TaskRepository.aggregate(pipeline)
-    .skip(skip)
-    .limit(perPage)
-    .toArray();
+  // let data = await TaskRepository.aggregate(pipeline)
+  //   .skip(skip)
+  //   .limit(perPage)
+  //   .toArray();
 
-  let result = {
-    total: count,
-    totalPage: Math.ceil(count / perPage),
-    currentPage: page,
-    data,
-  };
+  // let result = {
+  //   total: count,
+  //   totalPage: Math.ceil(count / perPage),
+  //   currentPage: page,
+  //   data,
+  // };
 
-  if (page < result.totalPage) result.nextPage = page + 1;
-  if (page > 1) result.prevPage = page - 1;
+  // if (page < result.totalPage) result.nextPage = page + 1;
+  // if (page > 1) result.prevPage = page - 1;
 
-  return result;
+  // return result;
+  return TaskRepository.paginate(...args)
 };
 
 const find = (query = {}) => {

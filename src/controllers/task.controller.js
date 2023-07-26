@@ -14,7 +14,7 @@ export const TaskController = {
       res.json(
         HttpResponse.Paginate(
           await Task.paginate({
-            query,
+            ...query,
             page: parseInt(req.query.page || 1),
             fields: req.query?.fields?.split(",").map((e) => e.trim()),
           })

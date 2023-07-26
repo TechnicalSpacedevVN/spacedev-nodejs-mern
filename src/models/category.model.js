@@ -5,13 +5,13 @@ import collection from "../config/database";
 export const CategoryRepository = collection.Category;
 
 const find = async (query = {}) => {
-  let { name } = query;
+  // let { name } = query;
 
-  let _query = _.omit(query, "name");
-  if (name) {
-    _query.name = { $regex: new RegExp(name, "i") };
-  }
-  return CategoryRepository.find(_query).toArray();
+  // let _query = _.omit(query, "name");
+  // if (name) {
+  //   _query.name = { $regex: new RegExp(name, "i") };
+  // }
+  return CategoryRepository.paginate(query);
 };
 const findById = async (id) => {
   if (ObjectId.isValid(id)) {
