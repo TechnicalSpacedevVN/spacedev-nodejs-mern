@@ -1,7 +1,9 @@
+import { ObjectId } from "mongodb";
 import collection, { DEFAULT_LIMIT } from "../config/database";
 import { readJsonFile, writeJsonFile } from "../utils/file";
 import { User } from "./user.model";
 import _ from "lodash";
+import { Category } from "./category.model";
 
 export const TaskRepository = collection.Task;
 
@@ -12,7 +14,12 @@ const tasks = readJsonFile("tasks") || [];
  *
  */
 
-const paginate = async (query = {}, page = 1, perPage = DEFAULT_LIMIT) => {
+const paginate = async ({
+  query = {},
+  page = 1,
+  perPage = DEFAULT_LIMIT,
+  fields = [],
+}) => {
   let { title } = query;
 
   let _query = _.omit(query, "title");
@@ -22,10 +29,59 @@ const paginate = async (query = {}, page = 1, perPage = DEFAULT_LIMIT) => {
   let count = await TaskRepository.countDocuments(_query);
 
   let skip = (page - 1) * DEFAULT_LIMIT;
+  // let data = await TaskRepository.find(_query)
+  //   .limit(perPage)
+  //   .skip(skip)
+  //   .toArray();
 
-  let data = await TaskRepository.find(_query)
-    .limit(perPage)
+  // await Promise.all(
+  //   data.map(async (task) => {
+  //     let pros = [];
+  //     if (task.category) pros.push(Category.findById(task.category));
+  //     if (task.users) pros.push(User.findByIds(task.users));
+
+  //     let [category = null, users = []] = await Promise.all(pros);
+  //     task.category = category;
+  //     task.users = users;
+  //   })
+  // );
+
+  const pipeline = [
+    {
+      $match: _query,
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: "$category", // convert từ array thành single
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "users",
+        foreignField: "_id",
+        as: "users",
+      },
+    },
+  ];
+  if (fields.length > 0) {
+    pipeline.push({
+      $project: fields.reduce(
+        (result, currentValue) => ({ ...result, [currentValue]: 1 }),
+        {}
+      ),
+    });
+  }
+
+  let data = await TaskRepository.aggregate(pipeline)
     .skip(skip)
+    .limit(perPage)
     .toArray();
 
   let result = {
@@ -65,8 +121,19 @@ const findById = (id) => {
   return false;
 };
 const create = async (data) => {
+  if (data.category && ObjectId.isValid(data.category))
+    data.category = new ObjectId(data.category);
+
+  if (
+    Array.isArray(data.users) &&
+    !data.users.some((e) => !ObjectId.isValid(e))
+  ) {
+    data.users = data.users.map((e) => new ObjectId(e));
+  }
+
   let task = await TaskRepository.insertOne(data);
-  return task;
+  data._id = task.insertedId;
+  return data;
 };
 const updateById = (id, dataUpdate) => {
   let c = tasks.find((e) => e.id === parseInt(id));

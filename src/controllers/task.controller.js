@@ -6,19 +6,18 @@ import _ from "lodash";
 export const TaskController = {
   get: async (req, res, next) => {
     try {
-      let query = _.omit(req.query, "page", "sort");
+      let query = _.omit(req.query, "page", "sort", "fields");
       let [sortBy = "_id", sortValue = "asc"] = req.query?.sort?.split(",") || [
         "_id",
         "asc",
       ];
       res.json(
         HttpResponse.Paginate(
-          await Task.paginate(
+          await Task.paginate({
             query,
-            parseInt(req.query.page || 1),
-            sortBy,
-            sortValue
-          )
+            page: parseInt(req.query.page || 1),
+            fields: req.query?.fields?.split(",").map((e) => e.trim()),
+          })
         )
       );
     } catch (err) {
@@ -32,7 +31,6 @@ export const TaskController = {
       if (t) {
         return res.json(Task.findById(req.params.id));
       }
-
       res.status(BadRequest).json({ error: "Task Not found" });
     } catch (err) {
       next(err);

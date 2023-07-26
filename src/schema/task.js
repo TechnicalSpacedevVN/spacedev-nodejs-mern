@@ -5,15 +5,15 @@ import { User } from "../models/user.model";
 export const updateTaskSchema = Joi.object({
   title: Joi.string(),
   description: Joi.string().optional().allow(null),
-  category: Joi.custom(async (value, helper) => {
+  category: Joi.string().external(async (value, helper) => {
     if (!(await Category.findById(value))) {
       return helper.message("Không tìm thấy category");
     }
   }),
   users: Joi.array()
-    .items(Joi.number())
-    .custom((value, helper) => {
-      if (User.findByIds(value).length < value.length) {
+    .items(Joi.string())
+    .external(async (value, helper) => {
+      if ((await User.findByIds(value)).length < value.length) {
         return helper.message("Không tìm thấy user");
       }
     }),

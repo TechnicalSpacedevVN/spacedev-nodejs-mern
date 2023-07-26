@@ -10,11 +10,12 @@ const paginate = async (query, page = 1, perPage = DEFAULT_LIMIT) => {
   if (name) {
     _query.$text = { $search: name };
   }
+  let skip = (page - 1) * perPage;
 
   let total = await UserRepository.countDocuments(_query);
 
   let data = await UserRepository.find(_query)
-    .limit(limit)
+    .limit(perPage)
     .skip(skip)
     .toArray();
 
@@ -40,12 +41,12 @@ const findById = (id) => {
 };
 
 const findByIds = (ids) => {
-  let checkObjectId = ids.some((e) => ObjectId.isValid(e));
-  if (checkObjectId) return false;
+  let checkObjectId = ids.some((e) => !ObjectId.isValid(e));
+  if (checkObjectId) return [];
 
   let arrayIds = ids.map((e) => new ObjectId(e));
 
-  return UserRepository.find({ id: { $in: arrayIds } });
+  return UserRepository.find({ _id: { $in: arrayIds } }).toArray();
 };
 const create = async (data) => {
   let result = await UserRepository.insertOne(data);

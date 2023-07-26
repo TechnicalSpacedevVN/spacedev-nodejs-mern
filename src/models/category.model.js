@@ -19,6 +19,14 @@ const findById = async (id) => {
   }
   return null;
 };
+const findByIds = async (id) => {
+  let checkObjectId = ids.some((e) => !ObjectId.isValid(e));
+  if (checkObjectId) return [];
+
+  let arrayIds = ids.map((e) => new ObjectId(e));
+
+  return CategoryRepository.find({ _id: { $in: arrayIds } }).toArray();
+};
 const create = async (data) => {
   let result = await CategoryRepository.insertOne(data);
   data._id = result.insertedId;
@@ -49,6 +57,7 @@ const deleteById = async (id) => {
 export const Category = {
   find,
   findById,
+  findByIds,
   create,
   updateById,
   deleteById,

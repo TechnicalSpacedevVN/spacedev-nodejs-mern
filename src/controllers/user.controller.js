@@ -7,11 +7,13 @@ import { DEFAULT_LIMIT } from "../config/database";
 export const UserController = {
   get: async (req, res, next) => {
     try {
-      let query = _.omit(req.query, "limit", "skip");
-      let limit = parseInt(req.query.limit || DEFAULT_LIMIT);
-      let skip = parseInt(req.query.skip || 0);
+      let query = _.omit(req.query, "page", "sort");
       // res.json(HttpResponse.Paginate(await User.find(req.query)));
-      res.json(HttpResponse.Paginate(await User.paginate(query, limit, skip)));
+      res.json(
+        HttpResponse.Paginate(
+          await User.paginate(query, parseInt(req.query.page || 1))
+        )
+      );
     } catch (err) {
       next(err);
     }
