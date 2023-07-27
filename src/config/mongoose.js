@@ -1,10 +1,22 @@
-import _ from "lodash";
+import mongoose from "mongoose";
 
-export const initPlugin = async (collections) => {
-  for (let i in collections) {
-    let collection = collections[i];
-    collection.paginate = async (query, relation) => {
-      let searchKey = Object.keys(await collection.indexInformation())?.[1];
+const dbName = process.env.DATABASE_NAME;
+const main = async () => {
+  await mongoose.connect(`mongodb://127.0.0.1:27017`, {
+    dbName,
+    auth: {
+      username: "root",
+      password: "example",
+    },
+  });
+  console.log("Connected to mongodb");
+
+  mongoose.plugin((schema, options) => {
+    // let indexs = schema.indexes();
+
+    // indexs = indexs.filter((e) => e[0]).map((e) => Object.keys(e[0])[0]);
+
+    schema.statics.paginate = async (query) => {
       let {
         page = 1,
         perPage = 10,
@@ -65,5 +77,7 @@ export const initPlugin = async (collections) => {
 
       return result;
     };
-  }
+  });
 };
+
+await main();

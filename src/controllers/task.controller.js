@@ -6,20 +6,7 @@ import _ from "lodash";
 export const TaskController = {
   get: async (req, res, next) => {
     try {
-      let query = _.omit(req.query, "page", "sort", "fields");
-      let [sortBy = "_id", sortValue = "asc"] = req.query?.sort?.split(",") || [
-        "_id",
-        "asc",
-      ];
-      res.json(
-        HttpResponse.Paginate(
-          await Task.paginate({
-            ...query,
-            page: parseInt(req.query.page || 1),
-            fields: req.query?.fields?.split(",").map((e) => e.trim()),
-          })
-        )
-      );
+      res.json(HttpResponse.Paginate(await Task.paginate(req.query)));
     } catch (err) {
       next(err);
     }
