@@ -13,31 +13,32 @@ export const TaskController = {
     res.json(HttpResponse.success({ count: await Task.count(_query) }));
   },
   get: async (req, res) => {
-    let { page = 1, sort } = req.query;
-    let categoryName = req.query["category.name"];
-    let categories = categoryName.split(",");
+    // let { page = 1, sort } = req.query;
+    // let categoryName = req.query?.["category.name"] || '';
+    // let categories = categoryName ? categoryName.split(",") : [];
 
-    page = parseInt(page);
-    let _query = _.omit(req.query, "page", "sort", "category.name");
-    let _sort = sort?.split(",") || ["_id", "desc"];
-    let sortBy, sortValue;
-    if (_sort.length === 2) {
-      sortBy = _sort[0];
-      sortValue = _sort[1];
-    } else {
-      if (sort === "newwest") {
-        sortBy = ".....";
-        sortValue = "desc";
-      }
-    }
+    // page = parseInt(page);
+    // let _query = _.omit(req.query, "page", "sort", "category.name");
+    // let _sort = sort?.split(",") || ["_id", "desc"];
+    // let sortBy, sortValue;
+    // if (_sort.length === 2) {
+    //   sortBy = _sort[0];
+    //   sortValue = _sort[1];
+    // } else {
+    //   if (sort === "newwest") {
+    //     sortBy = ".....";
+    //     sortValue = "desc";
+    //   }
+    // }
 
-    if (categories.length) {
-      _query["category.name"] = { $in: categories };
-    }
+    // console.log(categories)
+    // if (categories.length) {
+    //   _query["category.name"] = { $in: categories };
+    // }
 
     res.json(
       HttpResponse.Paginate(
-        await Task.paginate(_query, page, DEFAULT_LIMIT, sortBy, sortValue)
+        await Task.paginate(req.query)
       )
     );
   },
@@ -52,19 +53,21 @@ export const TaskController = {
   },
   create: async (req, res, next) => {
     try {
-      const { title, description, category, users, color } = req.body;
+      const { title, description, category, users, color, startDate } = req.body;
       const newTask = {
         title,
         description,
         category,
         users,
         color,
+        startDate,
         isDone: false,
       };
-
+      
+      let result = await Task.create(newTask)
       res
         .status(Created)
-        .json(HttpResponse.created(await Task.create(newTask)));
+        .json(HttpResponse.created(result));
     } catch (err) {
       next(err);
     }

@@ -17,7 +17,8 @@ export const updateTaskSchema = Joi.object({
       }
     }),
   color: Joi.string().optional().default("#ffffff"),
-  isDone: Joi.boolean().optional().default(false)
+  isDone: Joi.boolean().optional().default(false),
+  startDate: Joi.number().optional()
 });
 
 export const createTaskSchema = updateTaskSchema.fork(

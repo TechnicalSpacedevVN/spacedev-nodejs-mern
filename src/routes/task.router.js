@@ -10,7 +10,9 @@ taskRouter
   .get("/count", TaskController.count)
   .get("", TaskController.get)
   .get("/:id", TaskController.getDetail)
-  .post("", TaskController.create)
+
   .put("/:id", TaskController.updateById)
   .patch("/:id", validate(updateTaskSchema), TaskController.updatePartial)
   .delete("/:id", TaskController.deleteById);
+
+taskRouter.post("", TaskController.create);

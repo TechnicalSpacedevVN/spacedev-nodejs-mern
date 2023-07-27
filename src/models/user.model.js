@@ -1,6 +1,21 @@
 import _ from "lodash";
 import { User as UserRepository } from "../config/database";
 import { ObjectId } from "mongodb";
+import mongoose, { Schema } from "mongoose";
+
+const UserSchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  }
+})
+
+const UserModel = mongoose.model('User', UserSchema)
+
+
+const paginate = (query) => {
+  return UserRepository.paginate(query)
+}
 
 const find = async (query) => {
   let _query = _.omit(query, "name", "age");
@@ -63,4 +78,5 @@ export const User = {
   updateById,
   deleteById,
   findByIds,
+  paginate
 };

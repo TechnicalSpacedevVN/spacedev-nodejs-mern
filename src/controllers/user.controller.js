@@ -4,7 +4,7 @@ import { HttpResponse } from "../utils/HttpResponse";
 
 export const UserController = {
   get: async (req, res) => {
-    res.json(HttpResponse.Paginate(await User.find(req.query)));
+    res.json(HttpResponse.Paginate(await User.paginate(req.query)));
   },
   getDetail: async (req, res) => {
     let detail = await User.findById(req.params.id)

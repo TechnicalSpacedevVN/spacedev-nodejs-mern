@@ -4,7 +4,7 @@ import { HttpResponse } from "../utils/HttpResponse";
 
 export const CategoryController = {
   get: async (req, res) => {
-    res.json(HttpResponse.Paginate(await Category.find(req.query)));
+    res.json(HttpResponse.Paginate(await Category.paginate(req.query)));
   },
   getDetail: async (req, res) => {
     let detail = await Category.findById(req.params.id);

@@ -1,6 +1,22 @@
 import _ from "lodash";
 import { Category as CategoryRepository } from "../config/database";
 import { ObjectId } from "mongodb";
+import mongoose, { Schema } from "mongoose";
+
+
+const CategorySchema = new Schema({
+  name: {
+    type: String,
+    required: true
+  }
+})
+
+
+const CategoryModel = mongoose.model('Category', CategorySchema)
+
+const paginate = async (query) => {
+  return CategoryRepository.paginate(query)
+}
 
 const find = async (query) => {
   return await CategoryRepository.find().toArray();
@@ -44,6 +60,7 @@ const deleteById = async (id) => {
 
 export const Category = {
   find,
+  paginate,
   findById,
   create,
   updateById,

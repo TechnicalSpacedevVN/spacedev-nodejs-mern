@@ -4,6 +4,7 @@ import fs from 'fs'
 import { HttpResponse } from "../utils/HttpResponse";
 
 export const errorMiddleware = (err, req, res, next) => {
+  console.log('errorMiddleware')
   let log = 
     `\n${req.method}: ${req.url} - ${moment().format(
       "DD/MM/YYYY"
