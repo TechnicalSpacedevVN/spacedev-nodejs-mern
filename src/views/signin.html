@@ -1,0 +1,36 @@
+<div class="auth">
+  <div class="wrap">
+    <!-- login-form -->
+    <form name="loginForm" class="ct_login" action="" method="post">
+      <h2 class="title">Đăng nhập</h2>
+      <input name="username" type="text" placeholder="Email / Số điện thoại" />
+      <input name="password" type="password" placeholder="Mật khẩu" />
+      <div class="remember">
+        <label class="btn-remember">
+          <div>
+            <input type="checkbox" />
+          </div>
+          <p>Nhớ mật khẩu</p>
+        </label>
+        <a href="./reset-password.html" class="forget">Quên mật khẩu?</a>
+      </div>
+      <button class="btn rect main btn-login" type="submit" id="btnSigin">
+        đăng nhập
+      </button>
+      <div class="text-register">
+        <span>Nếu bạn chưa có tài khoản?</span>
+        <a class="link" href="./signup.html">Đăng ký</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const Joi = require("Joi");
+
+  document.getElementById("btnSigin").addEventListener("click", (ev) => {
+    ev.preventDefault();
+    var formData = new FormData(document.forms["loginForm"]);
+    console.log(Object.fromEntries(formData));
+  });
+</script>

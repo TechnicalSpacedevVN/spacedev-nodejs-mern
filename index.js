@@ -18,6 +18,7 @@ import handlebars from "express-handlebars";
 import { xTokenMiddleware } from "./src/middlewares/x-token.middleware";
 // import "./src/config/database";
 import "./src/config/mongoose";
+import crypto from "crypto";
 
 let __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -51,7 +52,23 @@ app.set("views", path.resolve(__dirname, "./src/views"));
 app.use(express.json());
 app.use(cors());
 
-app.use(helmet());
+app.use((req, res, next) => {
+  res.locals.cspNonce = crypto.randomBytes(16).toString("hex");
+  next();
+});
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        connectSrc: ["*"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'"],
+      },
+    },
+  })
+);
 app.use(assignId);
 
 // app.use(logMiddleware)

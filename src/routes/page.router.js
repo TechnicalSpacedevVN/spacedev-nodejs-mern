@@ -6,4 +6,5 @@ export const pageRouter = Router();
 pageRouter
   .get("/", PageController.home)
   .get("/courses", PageController.courses)
-  .get("/courses/:id", PageController.courseDetail);
+  .get("/courses/:id", PageController.courseDetail)
+  .get("/signin", PageController.sigin);
