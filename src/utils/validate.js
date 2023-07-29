@@ -13,11 +13,12 @@ export const validatePassowrd = (value, helper) => {
   if (dacBiet.test(value)) count++;
   let { name } = helper.state.ancestors[0];
 
-  name = name.toLowerCase();
+  name = name?.toLowerCase();
   let _p = value.toLowerCase();
-
-  if (_p.includes(name)) {
-    return helper.message("Không được chứa tên trong pasword");
+  if (name) {
+    if (_p.includes(name)) {
+      return helper.message("Không được chứa tên trong pasword");
+    }
   }
 
   if (count < 3) return helper.message("Password của bản không đủ mạnh");

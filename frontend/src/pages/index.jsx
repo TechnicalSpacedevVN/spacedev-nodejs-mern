@@ -9,8 +9,11 @@ import axiosInstance from "@/configs/api";
 import { IconThreeDotVertical } from "@/components/IconThreeDotVertical";
 import { queryClient } from "@/main";
 import { LIST_TASK } from "@/configs/queryKey";
+import { useAuth } from "@/components/AuthProvider";
+import {Navigate} from 'react-router-dom'
 
 export const Home = () => {
+  const {user} = useAuth()
   const [openCreate, setOpenCreate] = useState(false);
 
   const { data, isLoading } = useQuery({
@@ -19,6 +22,8 @@ export const Home = () => {
       return axiosInstance.get("/task");
     },
   });
+
+  if(!user) return <Navigate to="/login"/>
 
   return (
     <div className="max-w-[600px] p-10 mx-auto ">
@@ -34,7 +39,7 @@ export const Home = () => {
           Array.from(new Array(5)).map((_, i) => (
             <Skeleton.Input style={{ height: 200, width: "100%" }} />
           ))}
-        {data?.map((e) => (
+        {data?.data?.map((e) => (
           <ToDoCard key={e.id} {...e} />
         ))}
         {/* <ToDoCard className="bg-red-50" />

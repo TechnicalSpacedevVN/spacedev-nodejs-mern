@@ -68,7 +68,7 @@ const [form] = useForm()
         >
           <SelectTag
             options={
-              categories?.map((e) => ({ label: e.name, value: e.id })) || []
+              categories?.data?.map((e) => ({ label: e.name, value: e.id })) || []
             }
           />
         </Form.Item>
@@ -97,7 +97,7 @@ const [form] = useForm()
         >
           <DropdownSelect
             options={
-              users?.map((e) => ({
+              users?.data?.map((e) => ({
                 ...e,
                 value: e.id,
                 label: (

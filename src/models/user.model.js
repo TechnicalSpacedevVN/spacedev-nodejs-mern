@@ -7,27 +7,39 @@ const UserSchema = new Schema({
   name: {
     type: String,
     required: true
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true,
+    select: false
   }
 })
 
-const UserModel = mongoose.model('User', UserSchema)
+export const UserModel = mongoose.model('User', UserSchema)
 
 
 const paginate = (query) => {
-  return UserRepository.paginate(query)
+  return UserModel.paginate(query)
 }
 
 const find = async (query) => {
-  let _query = _.omit(query, "name", "age");
-  if (query.age) {
-    _query.age = parseInt(query.age);
-  }
+  return UserModel.paginate(query)
 
-  if (query.name) {
-    // _query.name = { $regex: new RegExp(query.name, "i") };
-    _query.$text = { $search: query.name };
-  }
-  return await UserRepository.find(_query).toArray();
+  // let _query = _.omit(query, "name", "age");
+  // if (query.age) {
+  //   _query.age = parseInt(query.age);
+  // }
+
+  // if (query.name) {
+  //   // _query.name = { $regex: new RegExp(query.name, "i") };
+  //   _query.$text = { $search: query.name };
+  // }
+  // return await UserRepository.find(_query).toArray();
 };
 const findById = async (id) => {
   if (ObjectId.isValid(id)) {
@@ -42,12 +54,9 @@ const findByIds = (ids) => {
   return users.filter((e) => ids.includes(e.id));
 };
 const create = async (data) => {
-  const result = await UserRepository.insertOne(data);
-  if (result.insertedId) {
-    data._id = result.insertedId;
-    return data;
-  }
-  return false;
+  let user = new UserModel(data)
+  await user.save()
+  return user
 };
 const updateById = async (id, dataUpdate) => {
   if (ObjectId.isValid(id)) {

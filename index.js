@@ -18,6 +18,7 @@ import handlebars from "express-handlebars";
 import { xTokenMiddleware } from "./src/middlewares/x-token.middleware";
 // import "./src/config/database";
 import './src/config/mongoose'
+import { authRouter } from "./src/routes/auth.router";
 
 let __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -65,6 +66,7 @@ app.use("/task", taskRouter);
 app.use("/category", categoryRouter);
 app.use("/user", userRouter);
 app.use("/file", fileRouter);
+app.use("/auth", authRouter);
 
 app.use(pageRouter);
 

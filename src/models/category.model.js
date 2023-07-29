@@ -15,7 +15,7 @@ const CategorySchema = new Schema({
 const CategoryModel = mongoose.model('Category', CategorySchema)
 
 const paginate = async (query) => {
-  return CategoryRepository.paginate(query)
+  return CategoryModel.paginate(query)
 }
 
 const find = async (query) => {

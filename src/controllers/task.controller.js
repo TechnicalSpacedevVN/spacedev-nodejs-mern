@@ -36,11 +36,7 @@ export const TaskController = {
     //   _query["category.name"] = { $in: categories };
     // }
 
-    res.json(
-      HttpResponse.Paginate(
-        await Task.paginate(req.query)
-      )
-    );
+    res.json(HttpResponse.Paginate(await Task.paginate(req.query)));
   },
   getDetail: async (req, res) => {
     // await delay(2000);
@@ -53,7 +49,8 @@ export const TaskController = {
   },
   create: async (req, res, next) => {
     try {
-      const { title, description, category, users, color, startDate } = req.body;
+      const { title, description, category, users, color, startDate } =
+        req.body;
       const newTask = {
         title,
         description,
@@ -63,11 +60,9 @@ export const TaskController = {
         startDate,
         isDone: false,
       };
-      
-      let result = await Task.create(newTask)
-      res
-        .status(Created)
-        .json(HttpResponse.created(result));
+
+      let result = await Task.create(newTask);
+      res.status(Created).json(HttpResponse.created(result));
     } catch (err) {
       next(err);
     }
@@ -107,5 +102,10 @@ export const TaskController = {
     } else {
       res.status(BadRequest).json({ error: "Task not found" });
     }
+  },
+  getCategory: async (req, res) => {
+    let { id } = req.params;
+    let category = await Task.getCategory(id);
+    res.json(HttpResponse.success(category))
   },
 };

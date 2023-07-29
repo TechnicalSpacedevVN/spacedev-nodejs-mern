@@ -16,8 +16,8 @@ const main = async () => {
   const Category = db.collection("categories");
   const User = db.collection("users");
 
-  Task.createIndex({ title: "text" });
-  User.createIndex({ name: "text" });
+  // Task.createIndex({ title: "text" });
+  // User.createIndex({ name: "text" });
   
 
   initPlugin({
@@ -37,4 +37,4 @@ let collection = await main();
 
 export const { Category, Task, User } = collection;
 
-export const DEFAULT_LIMIT = 3;
+export const DEFAULT_LIMIT = 10;

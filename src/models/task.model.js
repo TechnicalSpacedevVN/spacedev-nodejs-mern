@@ -9,10 +9,14 @@ import { ObjectId } from "mongodb";
 
 const TaskSchema = new mongoose.Schema(
   {
-    title: String,
+    title: {
+      type: String,
+      index: "text",
+    },
     description: {
       type: String,
       required: true,
+      index: "text",
     },
     color: {
       type: Schema.Types.String,
@@ -30,8 +34,18 @@ const TaskSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    methods: {
+      getCategory: async function () {
+        let task = await this.populate("category");
+        return task.category;
+      },
+    },
+    statics: {
+    },
   }
 );
+
+TaskSchema.index({title: 'text', description: 'text'})
 
 const TaskModel = mongoose.model("Task", TaskSchema);
 
@@ -52,7 +66,8 @@ const count = async (query) => {
 };
 
 const paginate = async (query) => {
-  return TaskModel.find(query).populate("category users");
+  return TaskModel.paginate(query);
+  // return TaskModel.find(query).populate("category users");
 
   // return TaskRepository.paginate(query, [
   //   {
@@ -92,9 +107,9 @@ const find = async (query) => {
 };
 const findById = async (id) => {
   let task = await TaskModel.findOne({ _id: id });
-  if(task) {
-    task.description = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-    task.save()
+  if (task) {
+    task.description = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    task.save();
   }
   // if (ObjectId.isValid(id)) {
   //   // return await TaskRepository.findOne({ _id: new ObjectId(id) });
@@ -141,6 +156,14 @@ const deleteById = async (id) => {
   return false;
 };
 
+const getCategory = async (id) => {
+  // let task = await TaskModel.findOne({ _id: id });
+  let category = await task.getCategory();
+
+  let task = new TaskModel({ title: "adsfasdf", category: "asdfasdfasdf" });
+  return category;
+};
+
 export const Task = {
   count,
   paginate,
@@ -149,4 +172,5 @@ export const Task = {
   create,
   updateById,
   deleteById,
+  getCategory,
 };
