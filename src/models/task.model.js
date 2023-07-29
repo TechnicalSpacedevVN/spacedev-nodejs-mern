@@ -23,7 +23,7 @@ console.log(TaskSchema.indexes());
 
 export let Task = mongoose.model("Post", TaskSchema);
 
-// export const TaskRepository = collection.Task;
+export const TaskRepository = collection.Task;
 
 // const tasks = readJsonFile("tasks") || [];
 
