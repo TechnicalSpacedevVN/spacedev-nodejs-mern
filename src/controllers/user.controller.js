@@ -2,6 +2,15 @@ import { BadRequest, NotFound } from "../config/StatusCode";
 import { User, UserModel } from "../models/user.model";
 import { HttpResponse } from "../utils/HttpResponse";
 import crypto from "crypto";
+import { sendMail } from "../utils/email";
+import fs from "fs";
+import path from "path";
+import { __dirname } from "../config";
+import { randomCode } from "../utils/random";
+
+const registerEmail = fs
+  .readFileSync(path.resolve(__dirname, "../views/email/register.html"))
+  .toString();
 
 export const UserController = {
   get: async (req, res) => {
@@ -46,10 +55,22 @@ export const UserController = {
           .json(HttpResponse.error("Email này đã tồn tại"));
       }
 
-      let { password } = req.body;
+      let { password, email } = req.body;
       password = crypto.createHash("sha256").update(password).digest("hex");
 
       let user = await User.create({ ...req.body, password });
+      let code = randomCode(60);
+
+      sendMail({
+        from: "Spacedev.vn",
+        to: email,
+        subject: "Kích hoạt tài khoản spacedev.vn",
+        html: registerEmail,
+        data: {
+          link: `http://localhost:8000/user/verify-register?email=${email}&code=${code}`,
+        },
+      });
+
       user.password = undefined;
 
       res.json(HttpResponse.success(user));
@@ -67,5 +88,15 @@ export const UserController = {
     } catch (err) {
       next(err);
     }
+  },
+  verifyRegister: async (req, res) => {
+    let { email, code } = req.query;
+    let user = await UserModel.findOne({ email, code });
+    if(user) {
+      user.code = null
+      user.isVerify = true
+      await user.save()
+    }
+    res.json({ success: true });
   },
 };
