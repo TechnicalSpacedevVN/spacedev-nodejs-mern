@@ -1,6 +1,19 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 import { DEFAULT_LIMIT } from "../config/database";
-import _ from 'lodash';
+import _ from "lodash";
+import { softDelete } from "./softDelete";
+
+mongoose.plugin(softDelete);
+mongoose.plugin((schema) => {
+  schema
+    .virtual("id")
+    .get(function () {
+      return this._id;
+    })
+    .set(function () {
+      this.id = this._id;
+    });
+});
 
 mongoose.Model.paginate = async function (query) {
   let { page = 1, fields, sort, search, include } = query;

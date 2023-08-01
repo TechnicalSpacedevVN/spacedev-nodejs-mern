@@ -3,20 +3,23 @@ import { Category as CategoryRepository } from "../config/database";
 import { ObjectId } from "mongodb";
 import mongoose, { Schema } from "mongoose";
 
-
-const CategorySchema = new Schema({
-  name: {
-    type: String,
-    required: true
+const CategorySchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    versionKey: "__v",
   }
-})
+);
 
-
-const CategoryModel = mongoose.model('Category', CategorySchema)
+const CategoryModel = mongoose.model("Category", CategorySchema);
 
 const paginate = async (query) => {
-  return CategoryModel.paginate(query)
-}
+  return CategoryModel.paginate(query);
+};
 
 const find = async (query) => {
   return await CategoryRepository.find().toArray();

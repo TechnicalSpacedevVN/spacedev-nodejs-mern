@@ -40,12 +40,11 @@ const TaskSchema = new mongoose.Schema(
         return task.category;
       },
     },
-    statics: {
-    },
+    statics: {},
   }
 );
 
-TaskSchema.index({title: 'text', description: 'text'})
+TaskSchema.index({ title: "text", description: "text" });
 
 const TaskModel = mongoose.model("Task", TaskSchema);
 
