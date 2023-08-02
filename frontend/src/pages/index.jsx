@@ -23,7 +23,7 @@ export const Home = () => {
     },
   });
 
-  if(!user) return <Navigate to="/login"/>
+  // if(!user) return <Navigate to="/login"/>
 
   return (
     <div className="max-w-[600px] p-10 mx-auto ">

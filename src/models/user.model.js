@@ -17,6 +17,15 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     select: false
+  },
+  verify: {
+    type: Boolean,
+    default: false
+  },
+  code: {
+    type: String,
+    default: null,
+    unique: true,
   }
 })
 

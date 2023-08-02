@@ -40,12 +40,11 @@ const TaskSchema = new mongoose.Schema(
         return task.category;
       },
     },
-    statics: {
-    },
+    statics: {},
   }
 );
 
-TaskSchema.index({title: 'text', description: 'text'})
+TaskSchema.index({ title: "text", description: "text" });
 
 const TaskModel = mongoose.model("Task", TaskSchema);
 
@@ -149,11 +148,11 @@ const updateById = async (id, dataUpdate) => {
   return false;
 };
 const deleteById = async (id) => {
-  if (ObjectId.isValid(id)) {
-    let result = await TaskRepository.deleteOne({ _id: new ObjectId(id) });
-    return result.deletedCount >= 1;
-  }
-  return false;
+  let result = await TaskModel.updateOne(
+    { _id: id },
+    { deletedAt: new Date() }
+  );
+  return result.modifiedCount >= 1;
 };
 
 const getCategory = async (id) => {

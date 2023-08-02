@@ -1,3 +1,4 @@
+import './src/config/mongoose'
 import express from "express";
 import { config } from "dotenv";
 import { taskRouter } from "./src/routes/task.router";
@@ -17,7 +18,6 @@ import { pageRouter } from "./src/routes/page.router";
 import handlebars from "express-handlebars";
 import { xTokenMiddleware } from "./src/middlewares/x-token.middleware";
 // import "./src/config/database";
-import './src/config/mongoose'
 import { authRouter } from "./src/routes/auth.router";
 
 let __dirname = dirname(fileURLToPath(import.meta.url));
