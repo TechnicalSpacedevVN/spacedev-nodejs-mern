@@ -13,8 +13,14 @@ const CategorySchema = new Schema(
   {}
 );
 
+export const categorySchema = `
+  type Category {
+    name: String
+  }
+`
+
 console.log("Cateogry model");
-const CategoryModel = mongoose.model("Category", CategorySchema);
+export const CategoryModel = mongoose.model("Category", CategorySchema);
 
 const paginate = async (query) => {
   return CategoryModel.paginate(query);

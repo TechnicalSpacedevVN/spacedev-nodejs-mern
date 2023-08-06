@@ -11,4 +11,7 @@ pageRouter
   })
   .get("/courses/:id", (req, res) => {
     res.render("course-detail");
+  })
+  .get("/graphql-page", (req, res) => {
+    res.render("graphql-sandbox", { layout: false });
   });

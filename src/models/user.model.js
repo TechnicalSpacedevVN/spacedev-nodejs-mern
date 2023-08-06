@@ -29,6 +29,15 @@ const UserSchema = new Schema({
   }
 })
 
+export const userSchema = `
+  type User {
+    name: String
+    email: String
+    verify: Boolean
+    code: String
+  }
+`
+
 export const UserModel = mongoose.model('User', UserSchema)
 
 

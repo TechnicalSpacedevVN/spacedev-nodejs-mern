@@ -20,6 +20,7 @@ import { xTokenMiddleware } from "./src/middlewares/x-token.middleware";
 // import "./src/config/database";
 import { authRouter } from "./src/routes/auth.router";
 
+
 let __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
@@ -61,7 +62,7 @@ app.use("/upload", express.static("./upload"));
 app.use(express.static("./public"));
 
 // app.use(xTokenMiddleware)
-
+app.all('/graphql', createHandler({ schema }));
 app.use("/task", taskRouter);
 app.use("/category", categoryRouter);
 app.use("/user", userRouter);

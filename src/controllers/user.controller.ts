@@ -7,9 +7,10 @@ import { randomCode } from "../utils/randomCode";
 import fs from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
+import { NextFunction, Request, Response } from "express";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
+// const __dirname = dirname(fileURLToPath(import.meta.url));
+console.log(__dirname);
 const emailRegisterHtml = fs
   .readFileSync(path.join(__dirname, "../views/emails/register.html"))
   .toString();
@@ -19,10 +20,10 @@ const forfotPasswordHtml = fs
   .toString();
 
 export const UserController = {
-  get: async (req, res) => {
+  get: async (req: Request, res: Response) => {
     res.json(HttpResponse.Paginate(await User.paginate(req.query)));
   },
-  getDetail: async (req, res) => {
+  getDetail: async (req: Request, res: Response) => {
     let detail = await User.findById(req.params.id);
     if (detail) {
       return res.json(HttpResponse.detail(await User.findById(req.params.id)));
@@ -30,29 +31,29 @@ export const UserController = {
 
     res.status(NotFound).json(HttpResponse.notFound("Không tìm thấy user"));
   },
-  create: async (req, res) => {
+  create: async (req: Request, res: Response) => {
     const { name, age, gender } = req.body;
     res.json(await User.create({ name, age, gender }));
   },
-  updateById: (req, res) => {
+  updateById: async (req: Request, res: Response) => {
     const { name, avatar } = req.body;
     const { id } = req.params;
-    let check = User.updateById(id, { name, avatar });
+    let check = await User.updateById(id, { name, avatar });
     if (check) {
       res.json({ updated: true });
     } else {
       res.status(400).json({ error: "User not found" });
     }
   },
-  deleteById: (req, res) => {
-    let check = User.deleteById(req.params.id);
+  deleteById: async (req: Request, res: Response) => {
+    let check = await User.deleteById(req.params.id);
     if (check) {
       res.json({ deleted: true });
     } else {
       res.status(400).json({ error: "User not found" });
     }
   },
-  register: async (req, res, next) => {
+  register: async (req: Request, res: Response, next: NextFunction) => {
     try {
       let check = await UserModel.findOne({ email: req.body.email });
       if (check) {
@@ -66,7 +67,7 @@ export const UserController = {
       let code = randomCode(100);
 
       let user = await User.create({ ...req.body, password, code });
-      user.password = undefined;
+      // user.password = undefined;
 
       await sendMail({
         from: '"Spacedev.vn 👻" <study@spacedev.vn>', // sender address
@@ -83,18 +84,20 @@ export const UserController = {
       next(err);
     }
   },
-  updateInfor: async (req, res, next) => {
+  updateInfor: async (req: any, res: Response, next: NextFunction) => {
     try {
       let { name } = req.body;
       let user = await UserModel.findOne({ _id: req.user });
-      user.name = name;
-      await user.save();
+      if (user) {
+        user.name = name;
+        await user.save();
+      }
       res.json(HttpResponse.success(true));
     } catch (err) {
       next(err);
     }
   },
-  verifyRegister: async (req, res, next) => {
+  verifyRegister: async (req: Request, res: Response, next: NextFunction) => {
     try {
       let { code, email } = req.query;
       let user = await UserModel.findOne({
@@ -104,7 +107,7 @@ export const UserController = {
       });
       if (user) {
         user.verify = true;
-        user.code = null;
+        user.code = '';
         await user.save();
         return res.json({ success: true });
       }
@@ -114,7 +117,7 @@ export const UserController = {
       next(err);
     }
   },
-  forgotPassword: async (req, res, next) => {
+  forgotPassword: async (req: Request, res: Response, next: NextFunction) => {
     try {
       let { email, redirect } = req.body;
       let user = await UserModel.findOne({ email });
@@ -143,7 +146,11 @@ export const UserController = {
       next(err);
     }
   },
-  resetPasswordByCode: async (req, res, next) => {
+  resetPasswordByCode: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       let { code, email, newPassword } = req.body;
       let user = await UserModel.findOne({
@@ -151,12 +158,15 @@ export const UserController = {
         code,
       });
       if (user) {
-        user.code = null;
-        let password = crypto.createHash("sha256").update(newPassword).digest("hex");
-        user.password = password
+        user.code = '';
+        let password = crypto
+          .createHash("sha256")
+          .update(newPassword)
+          .digest("hex");
+        user.password = password;
 
         await user.save();
-        return res.json(HttpResponse.success('Reset password thành công'));
+        return res.json(HttpResponse.success("Reset password thành công"));
       }
 
       return res.status(BadRequest).json(HttpResponse.error("Thao tác lỗi"));

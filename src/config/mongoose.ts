@@ -21,4 +21,6 @@ const main = async () => {
   // mongoose.sche
 };
 
-await main();
+(async () => {
+  return await main();
+})();

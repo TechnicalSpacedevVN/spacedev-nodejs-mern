@@ -18,13 +18,12 @@ const main = async () => {
 
   // Task.createIndex({ title: "text" });
   // User.createIndex({ name: "text" });
-  
 
   initPlugin({
     Task,
     Category,
     User,
-  })
+  });
 
   return {
     Task,
@@ -33,7 +32,9 @@ const main = async () => {
   };
 };
 
-let collection = await main();
+let collection = (async () => {
+  return await main();
+})();
 
 export const { Category, Task, User } = collection;
 

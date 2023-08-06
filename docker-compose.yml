@@ -10,3 +10,17 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - 27017:27017
+
+  redis:
+    image: redis:7.0.12
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes: 
+      - cache:/data
+
+
+volumes:
+  cache:
+    driver: local

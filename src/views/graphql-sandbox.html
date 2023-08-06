@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      iframe {
+        height: 100vh !important;
+        width: 100vw !important;
+      }
+    </style>
+  </head>
+  <body style="margin: 0; min-height: 100vh; min-width: 100vw;">
+    <div style="min-height: 100vh; min-width: 100vw;" id="embedded-sandbox"></div>
+    <script src="https://embeddable-sandbox.cdn.apollographql.com/_latest/embeddable-sandbox.umd.production.min.js"></script>
+    <script>
+      new window.EmbeddedSandbox({
+        target: "#embedded-sandbox",
+        initialEndpoint: "http://localhost:8000/graphql",
+      });
+    </script>
+  </body>
+</html>

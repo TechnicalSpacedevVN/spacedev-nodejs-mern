@@ -44,9 +44,20 @@ const TaskSchema = new mongoose.Schema(
   }
 );
 
+
+export const taskSchema = `
+  type Task {
+    title: String
+    description: String
+    color: String
+    category: Category
+    users: [User]
+  }
+`
+
 TaskSchema.index({ title: "text", description: "text" });
 
-const TaskModel = mongoose.model("Task", TaskSchema);
+export const TaskModel = mongoose.model("Task", TaskSchema);
 
 const count = async (query) => {
   let _query = _.omit(query, "title", "isDone", "minStartDate", "maxStartDate");
