@@ -6,7 +6,7 @@ import { expressMiddleware } from "@apollo/server/express4";
 // import { categoryRouter } from "./routes/category.router";
 import { userRouter } from "../../routes/user.router";
 // import { logMiddleware } from "./middlewares/log.middleware";
-// import { errorMiddleware } from "./middlewares/error.middleware";
+import { errorMiddleware } from "../../middlewares/error.middleware";
 // import { fileRouter } from "./routes/file.router";
 import { randomUUID } from "crypto";
 import morgan from "morgan";
@@ -66,8 +66,8 @@ export const AppDecorator = (options?: AppDecoratorOptions): any => {
           this.app.use(express.static("./public"));
           let { controllers } = options || {};
 
-          if(controllers) {
-            controllers.map(e => new e(this.app))
+          if (controllers) {
+            controllers.map((e) => new e(this.app));
           }
 
           // this.app.use(xTokenMiddleware)
@@ -89,7 +89,7 @@ export const AppDecorator = (options?: AppDecoratorOptions): any => {
 
           //   this.app.use(pageRouter);
 
-          // this.app.use(errorMiddleware);
+          this.app.use(errorMiddleware);
 
           this.app.all("*", (req, res) => {
             res.status(404).json({ error: "Not Found" });

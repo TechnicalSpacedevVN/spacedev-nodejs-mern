@@ -4,9 +4,15 @@ import { BaseController } from "./base.controller";
 
 @Controller("/demo")
 export class DemoController extends BaseController {
-  @Get("get-demo")
-  // @Validate(Joi.object({}))
+  @Get("/get-demo")
+  @Validate(Joi.object({ query: Joi.string().required() }))
   getDemo() {
+    console.log("getDemo");
     return "getDemo";
+  }
+
+  @Get("/get-demo2")
+  getDemo2() {
+    return "getDemo2";
   }
 }

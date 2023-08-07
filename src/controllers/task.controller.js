@@ -3,6 +3,10 @@ import { BadRequest, Created, NoContent } from "../config/StatusCode";
 import { Task } from "../models/task.model";
 import { HttpResponse } from "../utils/HttpResponse";
 import { DEFAULT_LIMIT } from "../config/database";
+import { Controller } from "../core/decorator/controller";
+
+@Controller("/task")
+export class TaskController {}
 
 export const TaskController = {
   count: async (req, res) => {
@@ -106,6 +110,6 @@ export const TaskController = {
   getCategory: async (req, res) => {
     let { id } = req.params;
     let category = await Task.getCategory(id);
-    res.json(HttpResponse.success(category))
+    res.json(HttpResponse.success(category));
   },
 };
