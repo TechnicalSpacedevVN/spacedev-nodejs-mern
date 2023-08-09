@@ -6,7 +6,7 @@ const ROUTERS_KEY = "metadata:routers";
 
 const VALIDATE_KEY = "metadata:routers:validate";
 
-export const Controller = (prefix: string) => {
+export const Controller = (prefix = '') => {
   return (target: any): any => {
     return class extends target {
       constructor(app: Express) {
@@ -26,7 +26,9 @@ export const Controller = (prefix: string) => {
             async (req: Request, res: Response, next: NextFunction) => {
               try {
                 let result = await r.handler(req, res, next);
-                res.json(result);
+                if(typeof result === 'object') {
+                  res.json(result);
+                }
               } catch (err) {
                 next(err);
               }

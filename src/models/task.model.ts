@@ -2,7 +2,6 @@ import mongoose, { Schema } from "mongoose";
 import { Category } from "./category.model";
 import { User } from "./user.model";
 import _ from "lodash";
-import { DEFAULT_LIMIT, Task as TaskRepository } from "../config/database";
 import { ObjectId } from "mongodb";
 
 // const DEFAULT_LIMIT = 10;
@@ -44,11 +43,21 @@ const TaskSchema = new mongoose.Schema(
   }
 );
 
+
+export const taskSchema = `
+  type Task {
+    title: String
+    description: String
+    color: String
+    category: Category
+  }
+`
+
 TaskSchema.index({ title: "text", description: "text" });
 
-const TaskModel = mongoose.model("Task", TaskSchema);
+export const TaskModel = mongoose.model("Task", TaskSchema);
 
-const count = async (query) => {
+const count = async (query: any) => {
   let _query = _.omit(query, "title", "isDone", "minStartDate", "maxStartDate");
 
   if (query.title) {
@@ -59,13 +68,13 @@ const count = async (query) => {
     _query.isDone = query.isDone === "true";
   }
 
-  let count = await TaskRepository.countDocuments(_query);
+  // let count = await TaskRepository.countDocuments(_query);
 
-  return count;
+  // return count;
 };
 
-const paginate = async (query) => {
-  return TaskModel.paginate(query);
+const paginate = async (query: any) => {
+  // return TaskModel.paginate(query);
   // return TaskModel.find(query).populate("category users");
 
   // return TaskRepository.paginate(query, [
@@ -91,7 +100,7 @@ const paginate = async (query) => {
   // ]);
 };
 
-const find = async (query) => {
+const find = async (query: any) => {
   let _query = _.omit(query, "title", "isDone");
 
   if (query.title) {
@@ -101,10 +110,10 @@ const find = async (query) => {
   if (query.isDone) {
     _query.isDone = query.isDone === "true";
   }
-  let result = await TaskRepository.find(_query).toArray();
-  return result;
+  // let result = await TaskRepository.find(_query).toArray();
+  // return result;
 };
-const findById = async (id) => {
+const findById = async (id: any) => {
   let task = await TaskModel.findOne({ _id: id });
   if (task) {
     task.description = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -116,7 +125,7 @@ const findById = async (id) => {
 
   return task;
 };
-const create = async (data) => {
+const create = async (data: any) => {
   try {
     let task = new TaskModel(data);
     // await TaskModel.updateOne({_id: 'abc'}, {title: 'asdfasdf'})
@@ -136,18 +145,18 @@ const create = async (data) => {
 
   // return data;
 };
-const updateById = async (id, dataUpdate) => {
-  if (ObjectId.isValid(id)) {
-    let result = await TaskRepository.updateOne(
-      { _id: new ObjectId(id) },
-      { $set: dataUpdate }
-    );
-    return result.modifiedCount >= 1;
-  }
+const updateById = async (id: any, dataUpdate: any) => {
+  // if (ObjectId.isValid(id)) {
+  //   let result = await TaskRepository.updateOne(
+  //     { _id: new ObjectId(id) },
+  //     { $set: dataUpdate }
+  //   );
+  //   return result.modifiedCount >= 1;
+  // }
 
   return false;
 };
-const deleteById = async (id) => {
+const deleteById = async (id: any) => {
   let result = await TaskModel.updateOne(
     { _id: id },
     { deletedAt: new Date() }
@@ -155,12 +164,12 @@ const deleteById = async (id) => {
   return result.modifiedCount >= 1;
 };
 
-const getCategory = async (id) => {
+const getCategory = async (id: any) => {
   // let task = await TaskModel.findOne({ _id: id });
-  let category = await task.getCategory();
+  // let category = await task.getCategory();
 
-  let task = new TaskModel({ title: "adsfasdf", category: "asdfasdfasdf" });
-  return category;
+  // let task = new TaskModel({ title: "adsfasdf", category: "asdfasdfasdf" });
+  // return category;
 };
 
 export const Task = {

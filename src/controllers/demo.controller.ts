@@ -22,6 +22,8 @@ export class DemoController {
     };
   }
 
+
+
   @Post("/post")
   @Validate(
     Joi.object({
@@ -32,6 +34,8 @@ export class DemoController {
     return { post: true };
   }
 
+
+  
   @Put("/post")
   putDemo4() {
     return { put: true };

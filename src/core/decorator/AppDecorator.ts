@@ -2,12 +2,18 @@ import { config } from "dotenv";
 import express, { Express } from "express";
 import cors from "cors";
 import helmet from "helmet";
-import path from "path";
+import path, { dirname } from "path";
 import { create } from "express-handlebars";
 import { errorMiddleware } from "../../middlewares/error.middleware";
+import { fileURLToPath } from "url";
+import {
+  IDatabaseConfig,
+  main as connectDatabase,
+} from "../../config/mongoose";
 
 interface AppDecoratorOptions {
   controllers?: any[];
+  database?: IDatabaseConfig;
 }
 
 export const AppDecorator = (options?: AppDecoratorOptions) => {
@@ -18,6 +24,10 @@ export const AppDecorator = (options?: AppDecoratorOptions) => {
       constructor() {
         super();
         this.app = express();
+
+        if (options?.database) {
+          connectDatabase(options.database);
+        }
 
         // const accessLogStream = fs.createWriteStream(
         //   path.join(__dirname, "./logs/access.log"),
@@ -40,12 +50,12 @@ export const AppDecorator = (options?: AppDecoratorOptions) => {
         });
         this.app.engine("html", hdb.engine);
         this.app.set("view engine", "html");
-        this.app.set("views", path.resolve(__dirname, "./src/views"));
+        this.app.set("views", path.resolve("./src/views"));
 
         this.app.use(express.json());
         this.app.use(cors());
 
-        this.app.use(helmet());
+        // this.app.use(helmet());
         // this.app.use(assignId);
 
         // this.app.use(logMiddleware)
@@ -55,13 +65,11 @@ export const AppDecorator = (options?: AppDecoratorOptions) => {
 
         // this.app.use(xTokenMiddleware)
 
-        if(Array.isArray(controllers) && controllers.length > 0) {
-            for(let i in controllers) {
-                new controllers[i](this.app)
-            }
+        if (Array.isArray(controllers) && controllers.length > 0) {
+          for (let i in controllers) {
+            new controllers[i](this.app);
+          }
         }
-
-        
 
         // this.app.use("/task", taskRouter);
         // this.app.use("/category", categoryRouter);
@@ -81,10 +89,15 @@ export const AppDecorator = (options?: AppDecoratorOptions) => {
       listen(port: number | string | undefined, cb: () => void) {
         this.app.listen(port, cb);
       }
+
+      use(...args: any[]): void {
+        this.app.use(...args);
+      }
     };
   };
 };
 
 export class BaseApp {
   listen(port: number | string | undefined, cb: Function) {}
+  use(...args: any[]): void {}
 }

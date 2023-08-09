@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { DEFAULT_LIMIT } from "../config/database";
+const DEFAULT_LIMIT = 10
 
 export async function paginate(query) {
   let { page = 1, fields, sort, search, include } = query;
